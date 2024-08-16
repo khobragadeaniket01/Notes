@@ -1,0 +1,250 @@
+Kubernetes Custom Resource:
+
+Creating a custom resource in Kubernetes with a simple Node.js application on Minikube involves several steps. I'll guide you through the process, including creating a Custom Resource Definition (CRD), implementing a simple Node.js application, and deploying it on Minikube.
+
+### Step 1: Start Minikube
+
+First, make sure Minikube is installed and start it:
+
+```sh
+minikube start
+```
+
+### Step 2: Create a Custom Resource Definition (CRD)
+
+Create a YAML file to define the CRD. This example defines a custom resource for a `NodeApp`:
+
+```yaml
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: nodeapps.mycompany.com
+spec:
+  group: mycompany.com
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                image:
+                  type: string
+                replicas:
+                  type: integer
+  scope: Namespaced
+  names:
+    plural: nodeapps
+    singular: nodeapp
+    kind: NodeApp
+    shortNames:
+    - na
+```
+
+Apply the CRD to your cluster:
+
+```sh
+kubectl apply -f crd.yaml
+```
+
+### Step 3: Create a Node.js Application
+
+Create a simple Node.js application. Here’s an example:
+
+**app.js:**
+```javascript
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Hello World\n');
+});
+
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
+});
+```
+
+**Dockerfile:**
+```Dockerfile
+FROM node:14
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "app.js"]
+```
+
+**package.json:**
+```json
+{
+  "name": "node-app",
+  "version": "1.0.0",
+  "description": "Simple Node.js application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "http": "0.0.1-security"
+  }
+}
+```
+
+Build the Docker image:
+
+```sh
+docker build -t my-node-app .
+```
+
+Push the Docker image to a registry (e.g., Docker Hub or Minikube's registry). For simplicity, we’ll use Minikube’s built-in registry:
+
+```sh
+eval $(minikube docker-env)
+docker build -t my-node-app .
+```
+
+### Step 4: Create a Custom Resource Instance
+
+Create a YAML file for an instance of the custom resource:
+
+```yaml
+apiVersion: mycompany.com/v1
+kind: NodeApp
+metadata:
+  name: my-node-app
+spec:
+  image: my-node-app
+  replicas: 2
+```
+
+Apply the custom resource to your cluster:
+
+```sh
+kubectl apply -f nodeapp-instance.yaml
+```
+
+### Step 5: Create a Controller to Manage the Custom Resource
+
+To manage the custom resource, you need a controller. A simple example is provided here using a Node.js script with `kubernetes-client` package:
+
+**controller.js:**
+```javascript
+const k8s = require('@kubernetes/client-node');
+const k8sApi = k8s.KubernetesObjectApi.makeApiClient();
+
+async function main() {
+  try {
+    const res = await k8sApi.listClusterCustomObject('mycompany.com', 'v1', 'nodeapps');
+    const nodeApps = res.body.items;
+
+    for (const nodeApp of nodeApps) {
+      const { name } = nodeApp.metadata;
+      const { image, replicas } = nodeApp.spec;
+
+      const deployment = {
+        apiVersion: 'apps/v1',
+        kind: 'Deployment',
+        metadata: {
+          name: name,
+          namespace: 'default'
+        },
+        spec: {
+          replicas: replicas,
+          selector: {
+            matchLabels: {
+              app: name
+            }
+          },
+          template: {
+            metadata: {
+              labels: {
+                app: name
+              }
+            },
+            spec: {
+              containers: [
+                {
+                  name: name,
+                  image: image,
+                  ports: [{ containerPort: 3000 }]
+                }
+              ]
+            }
+          }
+        }
+      };
+
+      await k8sApi.createOrReplaceNamespacedDeployment(name, 'default', deployment);
+      console.log(`Deployment for ${name} created/updated.`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+main();
+```
+
+Install the `kubernetes-client` package:
+
+```sh
+npm install @kubernetes/client-node
+```
+
+Run the controller script:
+
+```sh
+node controller.js
+```
+
+### Step 6: Verify the Deployment
+
+Check the deployment and services in your Minikube cluster:
+
+```sh
+kubectl get deployments
+kubectl get pods
+kubectl get services
+```
+
+You should see the deployments and pods created based on the custom resource.
+
+### Step 7: Expose the Application
+
+Expose the Node.js application using a Kubernetes service:
+
+```sh
+kubectl expose deployment my-node-app --type=NodePort --port=3000
+```
+
+Get the URL to access the service:
+
+```sh
+minikube service my-node-app --url
+```
+
+Visit the URL to see your Node.js application running.
+
+### Conclusion
+
+You have successfully created a custom resource in Kubernetes, implemented a simple Node.js application, and deployed it on Minikube. This guide covers the essential steps, including defining a CRD, creating a Node.js application, managing the custom resource with a controller, and exposing the application.
+
+
+
+
+docker build -t aniket20051992/custom-resource-controller:v1 .
+docker push aniket20051992/custom-resource-controller:v1

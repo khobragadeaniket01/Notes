@@ -1,0 +1,94 @@
+Git Notes:
+
+1. Basic Concepts
+   - Version control systems
+		A version control system (VCS) is a software tool that helps track and manage changes to files over time
+		
+   - Distributed vs. centralized VCS
+	 Centralize:
+		Single central repository
+		Users check out and commit to central server
+		Requires network connection for most operations
+		Examples: Subversion (SVN), Perforce
+	 Distributed:
+		Each user has a full copy of the repository
+		Users can work offline and synchronize later
+		Multiple backup copies of the project exist
+		Examples: Git, Mercurial
+
+2. Git Installation and Setup
+
+3. Git Configuration
+
+4. Git Repositories
+   - Initializing a repository
+   - Cloning a repository
+
+5. Basic Git Commands
+   - git add
+   - git commit
+   - git status
+   - git log
+   - git diff
+
+6. Branching and Merging
+   - Creating branches
+   - Switching branches
+   - Merging branches
+   - Resolving merge conflicts
+
+7. Remote Repositories
+   - Adding remotes
+   - Fetching and pulling
+   - Pushing changes
+
+8. Git Workflow Models
+   - Centralized workflow
+   - Feature branch workflow
+   - Gitflow workflow
+   - Forking workflow
+
+9. Advanced Git Commands
+   - git rebase
+   - git cherry-pick
+   - git reset
+   - git revert
+   - git stash
+
+10. Git Hooks
+
+11. Git Submodules and Subtrees
+
+12. Git Large File Storage (LFS)
+
+13. Git Internals
+    - Objects and references
+    - The .git directory structure
+
+14. Git Best Practices and Conventions
+    - Commit message guidelines
+    - Branching strategies
+
+15. Git Tools and Integrations
+    - GUI clients
+    - IDE integrations
+
+16. Collaboration with Git
+    - Pull requests
+    - Code reviews
+    - Issue tracking
+
+17. Git Hosting Platforms
+    - GitHub
+    - GitLab
+    - Bitbucket
+
+18. Git Security
+    - Signing commits and tags
+    - Managing sensitive data
+
+19. Git Performance Optimization
+
+20. Troubleshooting Common Git Issues
+
+Would you like me to elaborate on any of these topics or provide more specific information about Git?

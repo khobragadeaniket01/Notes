@@ -1,0 +1,155 @@
+
+ Kubernetes Service
+
+### Step 1: Create a Simple Node.js Application
+
+First, create a simple Node.js application that listens on port 8080 and responds with "Hello, World!".
+
+1. **Create a directory for your Node.js application:**
+
+    ```sh
+    mkdir node-app
+    cd node-app
+    ```
+
+2. **Initialize a new Node.js project and install Express.js:**
+
+    ```sh
+    npm init -y
+    npm install express
+    ```
+
+3. **Create an `index.js` file with the following content:**
+
+    ```js
+    const express = require('express');
+    const app = express();
+    const port = 8080;
+
+    app.get('/', (req, res) => {
+      res.send('Hello, World!');
+    });
+
+    app.listen(port, () => {
+      console.log(`Node app listening at http://localhost:${port}`);
+    });
+    ```
+
+4. **Create a `Dockerfile` to containerize your application:**
+
+    ```Dockerfile
+    FROM node:14
+    WORKDIR /usr/src/app
+    COPY package*.json ./
+    COPY . .
+    RUN npm install
+    EXPOSE 8080
+    CMD ["node", "index.js"]
+    ```
+
+5. **Build the Docker image:**
+
+    ```sh
+    docker build -t node-app:1.0 .
+    ```
+
+### Step 2: Create Kubernetes Manifests
+
+Now, create the necessary Kubernetes manifests to deploy and expose your Node.js application.
+
+1. **Create a Deployment manifest (`deployment.yaml`):**
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: node-app-deployment
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          app: node-app
+      template:
+        metadata:
+          labels:
+            app: node-app
+        spec:
+          containers:
+          - name: node-app
+            image: node-app:1.0
+            ports:
+            - containerPort: 8080
+    ```
+
+2. **Create a Service manifest (`service.yaml`):**
+
+    ```yaml
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: node-app-service
+    spec:
+      selector:
+        app: node-app
+      ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 8080
+      type: NodePort
+    ```
+
+### Step 3: Deploy to Kubernetes
+
+1. **Ensure you have access to a Kubernetes cluster and `kubectl` is configured.**
+
+2. **Apply the Deployment and Service manifests:**
+
+    ```sh
+    kubectl apply -f deployment.yaml
+    kubectl apply -f service.yaml
+    ```
+
+3. **Verify the Deployment and Service:**
+
+    ```sh
+    kubectl get deployments
+    kubectl get services
+    ```
+
+    You should see your `node-app-deployment` and `node-app-service` listed.
+
+4. **Get the NodePort assigned to your service:**
+
+    ```sh
+    kubectl get service node-app-service
+    ```
+
+    You will see an output like this:
+
+    ```
+    NAME              TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+    node-app-service  NodePort   10.0.0.1        <none>        80:30007/TCP   1m
+    ```
+
+    Note the `NodePort` (e.g., 30007).
+
+5. **Access the Node.js application:**
+
+    Find the IP of one of your nodes (use `kubectl get nodes -o wide` to get the node IPs) and open the following URL in your browser or use `curl`:
+
+    ```sh
+    curl http://<NodeIP>:<NodePort>
+    ```
+
+    Replace `<NodeIP>` with the IP of any of your Kubernetes nodes and `<NodePort>` with the port number you got in the previous step. You should see "Hello, World!" as the response.
+
+### Step 4: Clean Up
+
+To delete the Deployment and Service, use the following commands:
+
+```sh
+kubectl delete -f deployment.yaml
+kubectl delete -f service.yaml
+```
+
+This completes the guide on creating and exposing a simple Node.js application using Kubernetes.

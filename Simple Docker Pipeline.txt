@@ -1,0 +1,189 @@
+Task by uday:
+
+Guide me step by step how can i create a Azure pipeline in kubernetes deployment and services for a simple node js application
+
+Creating an Azure pipeline for deploying a simple Node.js application to Kubernetes involves several steps. Below is a step-by-step guide:
+
+### Prerequisites
+
+1. **Azure Subscription**: Ensure you have an active Azure subscription.
+2. **Azure DevOps Account**: Sign up for Azure DevOps if you don't have an account.
+3. **Azure Kubernetes Service (AKS)**: Create an AKS cluster in your Azure subscription.
+4. **Docker**: Install Docker on your local machine.
+5. **Node.js Application**: A simple Node.js application ready for deployment.
+
+### Step 1: Set Up Your Node.js Application
+
+1. **Create a new directory** and initialize a Node.js application:
+    ```sh
+    mkdir my-node-app
+    cd my-node-app
+    npm init -y
+    npm install express
+    ```
+
+2. **Create an `index.js` file**:
+    ```js
+    const express = require('express');
+    const app = express();
+    const port = 3000;
+
+    app.get('/', (req, res) => res.send('Hello World!'));
+
+    app.listen(port, () => {
+        console.log(`Example app listening at http://localhost:${port}`);
+    });
+    ```
+
+3. **Create a `Dockerfile`**:
+    ```Dockerfile
+    FROM node:14
+    WORKDIR /usr/src/app
+    COPY package*.json ./
+    RUN npm install
+    COPY . .
+    EXPOSE 3000
+    CMD ["node", "index.js"]
+    ```
+
+4. **Create a `k8s` directory** with Kubernetes manifest files:
+    - **Deployment (`deployment.yaml`)**:
+        ```yaml
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: my-node-app
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: my-node-app
+          template:
+            metadata:
+              labels:
+                app: my-node-app
+            spec:
+              containers:
+              - name: my-node-app
+                image: <your-docker-registry>/my-node-app:latest
+                ports:
+                - containerPort: 3000
+        ```
+    - **Service (`service.yaml`)**:
+        ```yaml
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: my-node-app
+        spec:
+          type: LoadBalancer
+          selector:
+            app: my-node-app
+          ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 3000
+        ```
+
+### Step 2: Set Up Azure DevOps Pipeline
+
+1. **Create a new project** in Azure DevOps.
+
+2. **Set Up Repositories**:
+    - Create a new repository and push your Node.js application code to this repository.
+
+3. **Create a Service Connection**:
+    - Go to `Project Settings` > `Service connections`.
+    - Create a new service connection for Azure Resource Manager with access to your AKS cluster.
+
+4. **Create Pipeline YAML**:
+    - Go to `Pipelines` > `Create Pipeline`.
+    - Select your repository.
+    - Configure the pipeline using the following `azure-pipelines.yml`:
+
+    ```yaml
+    trigger:
+    - main
+
+    variables:
+      dockerRegistryServiceConnection: '<your-service-connection>'
+      imageRepository: '<your-docker-registry>/my-node-app'
+      containerRegistry: '<your-docker-registry>'
+      kubernetesServiceConnection: '<your-k8s-service-connection>'
+      namespace: 'default'
+      tag: '$(Build.BuildId)'
+
+    stages:
+    - stage: Build
+      jobs:
+      - job: DockerBuild
+        displayName: Build and push Docker image
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: Docker@2
+          displayName: Build and push Docker image
+          inputs:
+            containerRegistry: '$(dockerRegistryServiceConnection)'
+            repository: '$(imageRepository)'
+            command: 'buildAndPush'
+            Dockerfile: '**/Dockerfile'
+            tags: |
+              $(tag)
+
+    - stage: Deploy
+      dependsOn: Build
+      jobs:
+      - job: DeployToK8s
+        displayName: Deploy to AKS
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: Kubernetes@1
+          displayName: Deploy to Kubernetes
+          inputs:
+            connectionType: 'Azure Resource Manager'
+            azureSubscriptionEndpoint: '$(kubernetesServiceConnection)'
+            action: 'apply'
+            namespace: '$(namespace)'
+            manifests: |
+              $(Pipeline.Workspace)/k8s/deployment.yaml
+              $(Pipeline.Workspace)/k8s/service.yaml
+            containers: '$(imageRepository):$(tag)'
+    ```
+
+### Step 3: Push and Run the Pipeline
+
+1. **Commit and push your code** to the repository.
+
+2. **Run the Pipeline**:
+    - Navigate to `Pipelines` in Azure DevOps.
+    - Select your pipeline and run it.
+    - The pipeline will build the Docker image, push it to the container registry, and then deploy it to your AKS cluster.
+
+### Step 4: Verify the Deployment
+
+1. **Get the External IP**:
+    - Run the following command to get the external IP of your service:
+    ```sh
+    kubectl get services my-node-app
+    ```
+
+2. **Access the Application**:
+    - Open a browser and navigate to the external IP to see your Node.js application running.
+
+This guide provides a basic setup for deploying a Node.js application to Kubernetes using Azure DevOps. You can extend and customize this pipeline to include more stages, such as testing and security scanning, as needed.
+\
+
+------------------------
+
+kubectl create secret docker-registry regcred \
+    --docker-server=https://index.docker.io/v1/ \
+    --docker-username=aniket20051992 \
+    --docker-password=Aniket@123 \
+    --docker-email=khobragadeaniket01@gmail.com
+
+
+'$ docker login DOCKER_REGISTRY_SERVER --username=DOCKER_USER --password=DOCKER_PASSWORD --email=DOCKER_EMAIL'.
+
+kubectl create secret docker-registry NAME --docker-username=user --docker-password=password --docker-email=email [--docker-server=string] [--from-file=[key=]source] [--dry-run=server|client|none]

@@ -1,0 +1,3 @@
+Note:
+
+1. For ArgoCD we have to keep our manifest file into seperate repo, give that path into argocd. Otherwise it will give error

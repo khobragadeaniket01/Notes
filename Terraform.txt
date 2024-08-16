@@ -1,0 +1,324 @@
+If you are an Azure AD administrator and need to assign the role to yourself or someone else, follow these steps:
+
+Navigate to Azure AD:
+
+Go to the Azure portal and select "Azure Active Directory."
+Roles and Administrators:
+
+Select "Roles and administrators" from the left-hand menu.
+Find the Role:
+
+Locate the role you want to assign, such as "Global Administrator," "Privileged Role Administrator," or any other relevant role.
+Assign the Role:
+
+Click on the role and then select "Add assignments."
+Search for the user or group you want to assign the role to, select them, and click "Add."
+
+-----------------------------------------------
+
+output: 
+Creation of storage account:
+
+required: Resource group, Location, Name, Performance, Redundancy
+
+
+-------------------------------------------------------------
+
+Certainly, I'll create comprehensive notes covering the most important aspects of Terraform. I'll break this down into several key sections for easier revision. Let's begin:
+
+1. Introduction to Terraform
+
+Terraform is an open-source Infrastructure as Code (IaC) tool created by HashiCorp. It allows you to define and provision infrastructure using a declarative language.
+
+Key points:
+- Declarative: You specify the desired end state, not the step-by-step process.
+- Cloud-agnostic: Works with various cloud providers and services.
+- Version controlled: Infrastructure code can be versioned, shared, and collaborated on.
+
+2. Core Concepts
+
+a) Providers:
+- Plugins that Terraform uses to interact with cloud platforms and other services.
+- Examples: AWS, Azure, Google Cloud, Kubernetes, GitHub.
+
+b) Resources:
+- Represent infrastructure objects like virtual networks, compute instances, or DNS records.
+- Defined in configuration files and managed by Terraform.
+
+c) Data Sources:
+- Allow Terraform to use information defined outside of Terraform, imported from existing infrastructure or other sources.
+
+d) Variables:
+- Input values that parameterize your Terraform configurations.
+- Can be set via command-line flags, files, or environment variables.
+
+e) Outputs:
+- Return values from your Terraform module, often used to display important information or pass data between modules.
+
+f) State:
+- Terraform's way of keeping track of the current state of your infrastructure.
+- Stored in a state file, crucial for determining what changes to make to infrastructure.
+
+3. Terraform Workflow
+
+a) Initialize:
+```
+terraform init
+```
+- Downloads provider plugins and sets up the working directory.
+
+b) Plan:
+```
+terraform plan
+```
+- Shows proposed changes to infrastructure without applying them.
+
+c) Apply:
+```
+terraform apply
+```
+- Applies the changes to reach the desired state of the infrastructure.
+
+d) Destroy:
+```
+terraform destroy
+```
+- Removes all resources managed by the Terraform configuration.
+
+4. Terraform Configuration Language (HCL)
+
+- Human-readable configuration language used to define infrastructure.
+- Key components:
+  - Blocks: Container for other content
+  - Arguments: Assign a value to a name
+  - Expressions: Represent a value
+
+Example:
+```hcl
+resource "aws_instance" "example" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "ExampleInstance"
+  }
+}
+```
+
+5. Modules
+
+- Containers for multiple resources that are used together.
+- Promote code reusability and organization.
+- Can be called multiple times with different input variables.
+
+6. State Management
+
+- Local state: Stored in a file on your local machine (default).
+- Remote state: Stored in a shared location like S3, allowing team collaboration.
+- State locking: Prevents concurrent state modifications, crucial for team environments.
+
+7. Workspaces
+
+- Allow managing multiple separate states for the same configuration.
+- Useful for managing different environments (dev, staging, prod) with the same code.
+
+8. Provisioners
+
+- Used to execute scripts on local or remote machines as part of resource creation or destruction.
+- Types: local-exec, remote-exec, file
+
+9. Functions and Expressions
+
+- Built-in functions for string manipulation, numeric operations, list processing, etc.
+- Conditional expressions for dynamic resource creation.
+
+10. Backend Configuration
+
+- Determines how state is stored and how operations are performed.
+- Supports various backends like S3, Azure Blob Storage, Google Cloud Storage.
+
+11. Terraform Cloud and Enterprise Features
+
+- Remote execution
+- Private module registry
+- Policy as code (Sentinel)
+- Cost estimation
+- Team collaboration features
+
+12. Best Practices
+
+- Use consistent formatting (terraform fmt)
+- Utilize modules for reusable components
+- Keep your Terraform version updated
+- Use variables and data sources to make configurations flexible
+- Implement a CI/CD pipeline for Terraform
+- Use remote state with locking in team environments
+- Separate state per environment
+- Use terragrunt for keeping your configurations DRY
+
+13. Advanced Topics
+
+- Null resources for arbitrary actions
+- Data sources for dynamic configurations
+- Terraform import for existing resources
+- Count and for_each for resource multiplication
+- Dynamic blocks for repeated nested blocks
+
+======================================================================================
+
+ Terraform `depends_on` in Azure
+
+## Introduction
+
+`depends_on` is a meta-argument in Terraform used to specify explicit dependencies between resources. While Terraform automatically determines resource dependencies based on attribute references, `depends_on` allows you to create dependencies that Terraform can't infer automatically.
+
+## Key Points
+
+1. Used to handle hidden resource dependencies
+2. Ensures proper order of resource creation and destruction
+3. Can be applied to resources, data sources, and modules
+
+## Syntax
+
+```hcl
+resource "azurerm_resource_type" "name" {
+  # ... other configuration ...
+
+  depends_on = [
+    azurerm_resource_type.other_resource_name,
+    azurerm_resource_type.another_resource_name,
+  ]
+}
+```
+
+## Use Cases in Azure
+
+1. Networking Dependencies:
+   - Ensuring subnets are created after virtual networks
+   - Creating network security groups before attaching them to subnets
+
+2. Resource Group Dependencies:
+   - Ensuring resources are created after their parent resource group
+
+3. Storage Account Dependencies:
+   - Creating containers after storage accounts are fully provisioned
+
+4. Database Dependencies:
+   - Ensuring databases are created after servers are fully provisioned
+
+5. Key Vault Dependencies:
+   - Creating secrets after the Key Vault is fully provisioned
+
+## Examples
+
+1. Virtual Network and Subnet:
+
+```hcl
+resource "azurerm_virtual_network" "example" {
+  name                = "example-network"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+resource "azurerm_subnet" "example" {
+  name                 = "example-subnet"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.example.name
+  address_prefixes     = ["10.0.1.0/24"]
+
+  depends_on = [azurerm_virtual_network.example]
+}
+```
+
+2. Azure SQL Server and Database:
+
+```hcl
+resource "azurerm_sql_server" "example" {
+  name                         = "example-sqlserver"
+  resource_group_name          = azurerm_resource_group.example.name
+  location                     = azurerm_resource_group.example.location
+  version                      = "12.0"
+  administrator_login          = "sqladmin"
+  administrator_login_password = "P@ssw0rd123!"
+}
+
+resource "azurerm_sql_database" "example" {
+  name                = "example-db"
+  resource_group_name = azurerm_resource_group.example.name
+  server_name         = azurerm_sql_server.example.name
+  edition             = "Standard"
+
+  depends_on = [azurerm_sql_server.example]
+}
+```
+
+3. Key Vault and Secret:
+
+```hcl
+resource "azurerm_key_vault" "example" {
+  name                        = "example-keyvault"
+  location                    = azurerm_resource_group.example.location
+  resource_group_name         = azurerm_resource_group.example.name
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+}
+
+resource "azurerm_key_vault_secret" "example" {
+  name         = "example-secret"
+  value        = "SecretValue123!"
+  key_vault_id = azurerm_key_vault.example.id
+
+  depends_on = [azurerm_key_vault.example]
+}
+```
+
+## Best Practices
+
+1. Use `depends_on` sparingly: Rely on implicit dependencies when possible.
+2. Use for non-obvious dependencies: Apply when Terraform can't automatically infer the relationship.
+3. Consider using `lifecycle` blocks for more complex dependency scenarios.
+4. Document your use of `depends_on` to explain the reasoning behind explicit dependencies.
+
+## Limitations
+
+1. Can increase deployment time as it forces sequential resource creation.
+2. Overuse can make configurations harder to understand and maintain.
+3. Doesn't guarantee that a resource is fully operational, only that its creation has started.
+
+## Alternatives to `depends_on`
+
+1. Implicit dependencies through resource references
+2. `terraform_remote_state` data source for cross-state dependencies
+3. `null_resource` with `triggers` for more complex dependency scenarios
+
+## Conclusion
+
+`depends_on` is a powerful feature in Terraform for managing complex resource dependencies, especially in Azure where certain resources may have hidden dependencies. Use it judiciously to ensure proper resource creation order while maintaining clean and efficient Terraform configurations.
+
+==========================================================================================================
+
+
+
+resource "azurerm_storage_blob" "sample" {
+    name                     = "sample.txt"
+    storage_account_name     = "terraformstore201992"
+    storage_container_name   = "data"
+    type                     = "Block"
+}
+
+azurerm_storage_blob => resource type (specifies that you are creating or managing a storage blob resource within Azure)
+sample => Resource name (used to refer to this particular instance of a storage blob within your Terraform configuration)
+sample.txt => blob name (specify name of blob file you are storing in)
+terraformstore201992 => storage_account_name (name of the Azure Storage Account where the blob will be stored. Storage accounts are top-level containers in Azure that hold blobs, queues, tables, and files.)
+Note : Storage account mustv already exist as this resource does not automatically create storage account
+data => Storage container name (specifies the name of the container within the storage account where the blob will reside. Containers organize blobs within a storage account, similar to directories in a file system.)
+Note is same
+type = "Block" => Specifies the type of blob you are creating
+Block Blob => commonly used blob type for storing text and binary data. ideal for uploading large amounts of data efficiently and support operations like uploading in chunks.
+Append blob => optimized for append operations
+Page blob => optimized for random access scenarios and used in Azure VMs for disks

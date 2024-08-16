@@ -1,0 +1,72 @@
+trigger:
+- none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ORGANIZATION_NAME: KubeTask
+  CLONE_PATH: $(Pipeline.Workspace)/repo
+  PROJECT_NAME: 'KubeTask'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '12.x'
+  displayName: 'Install Node.js'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Kubetask'
+    repository: 'aniket20051992/node-app'
+    command: 'buildAndPush'
+    Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+    tags: |
+      latest
+
+- script: |
+    echo "Installing Azure CLI extension..."
+    az extension add --name azure-devops
+  displayName: 'Install Azure DevOps Extension'
+
+- script: |
+    echo "Logging into Azure DevOps..."
+    echo "$(PAT)" | az devops login --organization https://dev.azure.com/AniketKhobragade0892
+
+    echo "Setting Azure DevOps organization..."
+    az devops configure --defaults organization=https://dev.azure.com/AniketKhobragade0892
+  displayName: 'Login to Azure DevOps'
+  env:
+    PAT: $(PAT)
+
+- script: |
+    set -e
+
+    echo "Cloning the repository..."
+    git clone https://$(PAT)@dev.azure.com/AniketKhobragade0892/$(ORGANIZATION_NAME)/_git/$(Build.Repository.Name) $(CLONE_PATH)
+
+    cd $(CLONE_PATH)
+
+    echo "Checking out the deployment branch..."
+    git checkout deployment
+
+    BRANCH_NAME="update-manifest-$(Build.BuildId)"
+
+    echo "Creating a new branch based on deployment branch with name ${BRANCH_NAME}..."
+    git checkout -b $BRANCH_NAME
+
+    echo "Updating the manifest file..."
+    sed -i "s|image: aniket20051992/node-app:.*|image: aniket20051992/node-app:$(Build.BuildId)|g" deployment.yaml
+
+    echo "Committing the changes..."
+    git config --global user.email "aniket.khobragade@polyxer.com"
+    git config --global user.name "Aniket"
+    git add deployment.yaml
+    git commit -m "Update image tag to new-tag"
+    git push origin $BRANCH_NAME
+
+    echo "Creating a pull request..."
+    az repos pr create --organization https://dev.azure.com/AniketKhobragade0892 --project $(PROJECT_NAME) --repository $(Build.Repository.Name) --source-branch $BRANCH_NAME --target-branch deployment --title "Update image tag" --description "Update image tag to new-tag"
+  env:
+    PAT: $(PAT)
+  displayName: 'Clone, Update, and Create PR'
