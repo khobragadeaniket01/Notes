@@ -1,0 +1,129 @@
+Essential Fields:
+	Date:
+		Order Date	
+		Delivary Date
+	
+	Sales Detail:
+		Order ID	
+		Product ID	
+		Product Name	
+		Quantity Sold	
+		Unit Price	
+		Total Sales Amount	
+		
+	Customer Information:	
+		Customer ID	
+		Customer Name	
+		Customer Location
+		
+	Sales Channel	
+	
+	Sales Representative:
+		Sales Rep ID	
+		Sales Rep Name	
+		
+	Product Category:	
+		Category ID	
+		Category Name	
+
+optional parameter:
+	Discount Amount	
+	Promotion Code	
+	Shipping Cost	
+	Shipping Method	
+	Return Date	
+	Return Amount	
+	Payment Method	
+	Payment Status	
+	Region
+	
+	
+	
+========================================================
+
+Important Data Element for Sales Visualization.
+
+	Total Sales Amount: The overall revenue generated from sales.
+	Quantity Sold: The total number of units sold across different products or categories.
+	Average Order Value: The average value of each sales transaction (Total Sales Amount / Number of Orders).
+	Sales by Product: Breakdown of sales revenue or quantity sold by individual products.
+	Sales by Category: Breakdown of sales revenue or quantity sold by product categories (e.g., Electronics, Furniture).
+	Sales by Region: Sales data segmented by geographic region (e.g., North America, Europe).
+	Sales by Customer: Revenue generated from individual customers or customer segments.
+	Sales by Channel: Distribution of sales across different channels (e.g., Online, In-Store).
+	Sales by Sales Representative: Performance of individual sales representatives in terms of revenue or units sold.
+		y-axis: Category , x-axis: sales
+	Sales Trends Over Time: Sales performance over time, such as daily, weekly, monthly, or quarterly trends.
+	Top Performing Products or Categories: Highlighting products or categories with the highest sales.
+	Sales Targets vs. Actuals: Comparison between target sales and actual sales achieved.
+	Returns and Refunds: Data on returned products and refunded amounts.
+	Discounts and Promotions Impact: Analysis of sales influenced by discounts or promotional campaigns.
+	
+=====================================================================
+
+
+Data Elements for Sales Visualizations
+	Sales: The total amount of sales revenue.
+	Quantity: The number of units sold.
+	Profit: The profit generated from sales (Sales - Cost).
+	Order Date: The date when the sales order was placed.
+	Ship Date: The date when the product was shipped.
+	Customer Name: The name of the customer who made the purchase.
+	Customer ID: A unique identifier for each customer.
+	Product Name: The name of the product sold.
+	Product ID: A unique identifier for each product.
+	Category: The category to which the product belongs (e.g., Electronics, Furniture).
+	Sub-Category: A more granular classification of products within a category.
+	Segment: The customer segment (e.g., Consumer, Corporate).
+	Country, City, State, Region: Geographic data for segmenting sales by location.
+	Ship Mode: The method used for shipping (e.g., Standard, Express).
+	Returns: Data indicating if the product was returned.
+	Payment Mode: The method of payment used by the customer (e.g., Credit Card, PayPal).
+
+
+Recommended Visualizations
+	Total Sales: Displayed using KPI, card, or gauge charts.
+	Sales by Product/Category/Sub-Category: Visualized using bar, column, or tree map charts.
+	Sales Trends Over Time: Line or area charts for sales performance over different periods (daily, monthly, yearly).
+	Sales by Region: A map visualization to display sales by location.
+	Top Customers: Bar chart or table to show the highest revenue-generating customers.
+	Profit by Product or Category: Bar or column charts to highlight the most profitable products or categories.
+	Sales Returns Analysis: Bar chart or matrix table to analyze returns by product or customer.
+	Sales Performance by Segment: Pie or donut charts to visualize sales by customer segment.
+	Shipping Mode Impact: Analyze how different shipping modes affect sales or profit margins using bar or column charts.	
+	
+	
+
+Top Product
+Top Category
+Payment Mode
+Category List
+Total Sales by Product
+YearWise Total Sales by Product
+Total Sales by Country
+YearWise Total Sales by Country
+Location Map
+
+
+Product, Sales Manager and country in the search Bar.
+from and to date in header
+Transaction, Quantity Sold, Sales, Total Profit, Profit % in cards
+Transaction by Date in Ribbion chart
+Transaction by Product in circle chart
+Transaction by Sales Manager in bar chart
+Transaction by country in Map 
+
+
+-----------------------------------------------
+
+Car Sales Dashboard
+	YTD Total Sales in Card
+	YTD Average price in Card
+	YTD Cars Sold in Card
+	
+	YTD Sales Weekly Trends in Area chart
+	YTD Total Sales of body style in Doughnut charts
+	YTD Total sales by color in Doughnut chart
+	
+	
+	
