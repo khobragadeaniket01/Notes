@@ -1,0 +1,116 @@
+Interview Question on Azure Devops 
+
+
+## 30 Azure DevOps Interview Questions with Answers
+
+### Azure DevOps Fundamentals
+
+1. **What is Azure DevOps and its core components?**
+   * Azure DevOps is a cloud-based DevOps platform that provides a comprehensive set of tools for software development and delivery. Its core components include Azure Repos, Azure Pipelines, Azure Boards, Azure Artifacts, and Azure Test Plans.
+
+2. **What are the benefits of using Azure DevOps?**
+   * Increased collaboration and communication between teams
+   * Improved software quality through automated testing and continuous integration/continuous delivery (CI/CD)
+   * Faster time to market with streamlined development and deployment processes
+   * Scalability and flexibility to accommodate growing teams and projects
+
+### Azure Repos
+
+3. **What are the different types of repositories supported by Azure Repos?**
+   * Git and Team Foundation Version Control (TFVC)
+
+4. **How do you create a new Git repository in Azure Repos?**
+   * You can create a new Git repository directly in the Azure Repos portal or by using the Azure DevOps CLI or REST APIs.
+
+5. **What is a pull request and how is it used in Azure Repos?**
+   * A pull request is a mechanism for proposing changes to a repository. It allows developers to review and provide feedback on the changes before they are merged into the main branch.
+
+### Azure Pipelines
+
+6. **What is a pipeline in Azure DevOps?**
+   * A pipeline is a series of jobs that run sequentially or in parallel to build, test, and deploy applications.
+
+7. **How do you create a CI/CD pipeline in Azure DevOps?**
+   * You can create a pipeline using the YAML editor or the classic UI. The pipeline definition specifies the steps involved in the build, test, and deployment process.
+
+8. **What is a build agent and how does it work?**
+   * A build agent is a machine that runs the jobs defined in a pipeline. It can be a cloud-based agent or a self-hosted agent.
+
+9. **What is a release pipeline and how is it different from a build pipeline?**
+   * A release pipeline is used to deploy applications to different environments (e.g., development, testing, production). It is typically triggered by a successful build.
+
+### Azure Boards
+
+10. **What is Azure Boards and how is it used for project management?**
+   * Azure Boards is a work item tracking tool that provides features like backlogs, sprint planning, and task management.
+
+11. **What are the different work item types in Azure Boards?**
+   * Task, Bug, Feature, User Story, Epic
+
+12. **How do you create a Kanban board in Azure Boards?**
+   * You can create a Kanban board by selecting the Kanban template when creating a new project.
+
+### Azure Artifacts
+
+13. **What is Azure Artifacts and how is it used for package management?**
+   * Azure Artifacts is a package management service that allows you to create, host, and share packages with your team.
+
+14. **What types of packages can be stored in Azure Artifacts?**
+   * NuGet, npm, Maven, Python, Universal Packages
+
+15. **How do you connect your Azure DevOps pipeline to Azure Artifacts?**
+   * You can use the `NuGet` or `npm` tasks in your pipeline to connect to Azure Artifacts and restore or publish packages.
+
+### Azure Test Plans
+
+16. **What is Azure Test Plans and how is it used for testing?**
+   * Azure Test Plans is a test management tool that provides features like test plans, test cases, and test runs.
+
+17. **What is a test case and how is it created in Azure Test Plans?**
+   * A test case is a set of steps that define how to test a specific feature or functionality. You can create test cases manually or using test generators.
+
+18. **How do you execute test cases and track test results in Azure Test Plans?**
+   * You can execute test cases manually or using automated tests. Test results can be tracked and analyzed in Azure Test Plans.
+
+### Advanced Topics
+
+19. **What is DevOps culture and how does it relate to Azure DevOps?**
+   * DevOps culture is a set of practices and beliefs that promote collaboration, automation, and continuous improvement. Azure DevOps provides the tools and infrastructure to support a DevOps culture.
+
+20. **What is continuous integration (CI) and how is it implemented in Azure DevOps?**
+   * CI is the practice of merging code changes into a shared repository on a frequent basis. In Azure DevOps, CI is implemented through build pipelines that automatically build and test code whenever changes are committed.
+
+21. **What is continuous delivery (CD) and how is it implemented in Azure DevOps?**
+   * CD is the practice of automatically deploying code changes to production environments. In Azure DevOps, CD is implemented through release pipelines that automate the deployment process.
+
+22. **What is Infrastructure as Code (IaC) and how is it used with Azure DevOps?**
+   * IaC is the practice of managing infrastructure (e.g., virtual machines, networks) as code. Azure DevOps can be used to automate the creation, configuration, and deployment of infrastructure using tools like Terraform or Azure Resource Manager templates.
+
+23. **What is a service connection in Azure DevOps and how is it used?**
+   * A service connection is a configuration that allows you to connect Azure DevOps to external services (e.g., GitHub, Azure subscriptions). It is used to access resources or trigger actions in those services.
+
+24. **What is a pipeline variable and how is it used?**
+   * A pipeline variable is a named value that can be used within a pipeline definition. It allows you to parameterize your pipeline and make it more flexible.
+
+25. **What is a pipeline artifact and how is it used?**
+   * A pipeline artifact is a file or directory that is generated as part of a pipeline run. It can be used as input for subsequent pipelines or stored for later use.
+
+26. **What is Azure DevOps Server and how is it different from Azure DevOps Services?**
+   * Azure DevOps Server is an on-premises version of Azure DevOps. Azure DevOps Services is a cloud-based version.
+
+27. **What is Azure DevOps Repos integration with GitHub?**
+   * Azure DevOps Repos can be integrated with GitHub to allow teams to use GitHub for version control while still leveraging the other features of Azure DevOps.
+
+28. **What is Azure DevOps Boards integration with Microsoft Teams?**
+   * Azure DevOps Boards can be integrated with Microsoft Teams to allow teams to collaborate on work items and receive notifications directly in their Teams channels.
+
+29. **What is Azure DevOps Pipelines integration with Azure Kubernetes Service (AKS)?**
+   * Azure DevOps Pipelines can be integrated with AKS to automate the deployment of containerized applications to Kubernetes clusters.
+
+30. **What are some best practices for using Azure DevOps effectively?**
+   * Use a consistent naming convention for pipelines, releases, and work items.
+   * Automate as much as possible, especially for repetitive tasks.
+   * Use version control for all code and configuration files.
+   * Regularly review and update your pipeline definitions.
+   * Monitor pipeline performance and identify bottlenecks.
+   * Continuously improve your DevOps processes based on feedback and data.
