@@ -2,7 +2,7 @@ Azure Pipelines is a powerful service within Azure DevOps that enables the autom
 
 ### 1. **Introduction to Azure Pipelines**
    - Overview of Azure Pipelines
-		**Azure Pipelines** is a cloud-based service in Azure DevOps for automating build, test, and deployment processes. It supports continuous integration (CI) and continuous delivery (CD) for applications on various platforms and languages.
+		Azure Pipelines is a cloud-based service in Azure DevOps for automating build, test, and deployment processes. It supports continuous integration (CI) and continuous delivery (CD) for applications on various platforms and languages.
 
 		### Key Features
 		- **Continuous Integration (CI)**: Automatically build and test code with each commit.

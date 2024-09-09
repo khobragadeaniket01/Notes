@@ -1,0 +1,39 @@
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+  - name: branch
+    displayName: 'Branch Selection'
+    type: string
+    default: 'one'
+    values:
+      - one
+      - two
+      - three
+      - four
+
+jobs:
+- job: CheckoutAndList
+  steps:
+  
+  - ${{ if or(eq(parameters.branch, 'one'), eq(parameters.branch, 'two')) }}:
+    - checkout: git://EQMS/EQMS@refs/heads/${{ parameters.branch }}
+      displayName: 'Checkout Branch in EQMS Repository'
+
+  - ${{ if or(eq(parameters.branch, 'three'), eq(parameters.branch, 'four')) }}:
+    - checkout: git://EQMS/EQMS2@refs/heads/${{ parameters.branch }}
+      displayName: 'Checkout Branch in EQMS2 Repository'
+
+  - script: |
+      echo Checked out to branch ${{ parameters.branch }} in the appropriate repository.
+    displayName: 'Confirm Checkout'
+
+  - task: CmdLine@2
+    displayName: 'List Files in the Checked-Out Branch'
+    inputs:
+      script: |
+        echo Listing files in $(Build.SourcesDirectory)...
+        dir /B $(Build.SourcesDirectory)  

@@ -1,0 +1,451 @@
+Guide me step by step how can i create a linux virtual machine using terraform in azure portal with storage account, storage container and storage blob so that we can save the tfstate file securely i am using already existing resource group, so guide accordingly
+
+Creating a Linux virtual machine using Terraform in Azure while securely storing the Terraform state file in a storage account involves several steps. Below is a step-by-step guide to achieve this, assuming you have an existing resource group.
+
+### Prerequisites
+
+1. **Azure Account:** Ensure you have an active Azure account.
+2. **Terraform Installed:** Make sure Terraform is installed on your machine. You can download it from the [Terraform website](https://www.terraform.io/downloads.html).
+3. **Azure CLI Installed:** Ensure you have the Azure CLI installed. You can download it from the [Azure CLI website](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+4. **Azure Subscription:** You need an active Azure subscription.
+5. **Existing Resource Group:** You need an existing resource group in which you want to create the resources.
+
+### Step-by-Step Guide
+
+#### Step 1: Configure Azure CLI
+
+Log in to your Azure account using the Azure CLI:
+
+```bash
+az login
+```
+
+Set the subscription you want to use:
+
+```bash
+az account set --subscription "your-subscription-name-or-id"
+```
+
+#### Step 2: Create a Storage Account and Blob Container for Terraform State
+
+1. **Create a Storage Account:**
+
+   Use the Azure CLI to create a storage account in your existing resource group. Make sure the storage account name is globally unique.
+
+   ```bash
+   az storage account create \
+     --name yourstorageaccountname \
+     --resource-group your-resource-group \
+     --location your-location \
+     --sku Standard_LRS
+   ```
+
+2. **Create a Blob Container:**
+
+   Create a blob container within the storage account to store the Terraform state file.
+
+   ```bash
+   az storage container create \
+     --name tfstate \
+     --account-name yourstorageaccountname
+   ```
+
+#### Step 3: Configure Terraform Backend
+
+Create a new directory for your Terraform configuration and create a `main.tf` file:
+
+```bash
+mkdir my-terraform-project
+cd my-terraform-project
+touch main.tf
+```
+
+Edit the `main.tf` file to configure the Terraform backend with the storage account details:
+
+```hcl
+terraform {
+  backend "azurerm" {
+    storage_account_name = "yourstorageaccountname"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
+}
+```
+
+#### Step 4: Write Terraform Configuration
+
+Add the following configuration to `main.tf` to create a Linux VM:
+
+```hcl
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_virtual_network" "main" {
+  name                = "myVnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = "your-location"
+  resource_group_name = "your-resource-group"
+}
+
+resource "azurerm_subnet" "internal" {
+  name                 = "mySubnet"
+  resource_group_name  = "your-resource-group"
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_network_interface" "main" {
+  name                = "myNIC"
+  location            = "your-location"
+  resource_group_name = "your-resource-group"
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.internal.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_virtual_machine" "main" {
+  name                  = "myVM"
+  location              = "your-location"
+  resource_group_name   = "your-resource-group"
+  network_interface_ids = [azurerm_network_interface.main.id]
+  vm_size               = "Standard_B1s"
+
+  storage_os_disk {
+    name              = "myOsDisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+
+  os_profile {
+    computer_name  = "hostname"
+    admin_username = "azureuser"
+    admin_password = "P@ssw0rd1234"
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = false
+  }
+}
+```
+
+Replace `"your-location"`, `"your-resource-group"`, and `"yourstorageaccountname"` with your actual Azure location, resource group name, and storage account name.
+
+#### Step 5: Initialize Terraform
+
+Run the following command to initialize Terraform. This will set up the backend and download the necessary provider plugins.
+
+```bash
+terraform init
+```
+
+#### Step 6: Plan and Apply the Configuration
+
+1. **Plan the Configuration:**
+
+   Run `terraform plan` to see the changes that will be made by this configuration.
+
+   ```bash
+   terraform plan
+   ```
+
+2. **Apply the Configuration:**
+
+   Run `terraform apply` to create the resources. You will be prompted to confirm the action.
+
+   ```bash
+   terraform apply
+   ```
+
+#### Step 7: Verify the Deployment
+
+Once the deployment is complete, you can verify the resources in the Azure portal under your resource group.
+
+#### Step 8: Cleanup Resources
+
+When you are done and want to remove the resources, you can use `terraform destroy`:
+
+```bash
+terraform destroy
+```
+
+This command will remove all resources defined in the Terraform configuration.
+
+### Summary
+
+By following these steps, you have created a Linux virtual machine in Azure using Terraform and securely stored the Terraform state file in a storage account. This setup helps maintain the state of your infrastructure and ensures that your configurations are safely stored.
+
+-----------------------------------------------------------------------
+
+Got error: 
+Error: Either an Access Key / SAS Token or the Resource Group for the Storage Account must be specified - or Azure AD Authentication must be enabled 
+
+got above error in terraform init
+
+=> 
+The error message you received indicates that Terraform requires access credentials to interact with the Azure Storage Account where the Terraform state file is stored. There are a few ways to provide these credentials: using an Access Key, a SAS Token, or enabling Azure AD Authentication. Here’s how you can resolve this error by providing the necessary credentials.
+
+### Option 1: Use Access Keys
+
+You can provide the access keys directly in your Terraform configuration. Here are the steps to do that:
+
+1. **Retrieve the Access Key:**
+
+   You can get the access key for your storage account via the Azure CLI or the Azure Portal.
+
+   ```bash
+   az storage account keys list --account-name yourstorageaccountname --resource-group your-resource-group
+   ```
+
+   Note down one of the keys from the output.
+
+2. **Update `main.tf` to Use the Access Key:**
+
+   Modify your `main.tf` file to include the access key for the backend configuration.
+
+   ```hcl
+   terraform {
+     backend "azurerm" {
+       storage_account_name = "yourstorageaccountname"
+       container_name       = "tfstate"
+       key                  = "terraform.tfstate"
+       access_key           = "your-access-key"
+     }
+   }
+   ```
+
+   Make sure to replace `"your-access-key"` with the actual access key obtained from the previous step.
+
+### Option 2: Use a SAS Token
+
+Alternatively, you can use a SAS Token to authenticate with the storage account.
+
+1. **Generate a SAS Token:**
+
+   Use the Azure CLI to generate a SAS Token for your storage account.
+
+   ```bash
+   az storage account generate-sas \
+     --permissions acdlrw \
+     --account-name yourstorageaccountname \
+     --services b \
+     --resource-types co \
+     --expiry 2024-08-31T00:00:00Z \
+     --output tsv
+   ```
+
+   This command generates a SAS Token valid until the specified expiry date. Make sure to adjust the expiry date as needed.
+
+2. **Update `main.tf` to Use the SAS Token:**
+
+   Modify your `main.tf` file to include the SAS Token for the backend configuration.
+
+   ```hcl
+   terraform {
+     backend "azurerm" {
+       storage_account_name = "yourstorageaccountname"
+       container_name       = "tfstate"
+       key                  = "terraform.tfstate"
+       sas_token            = "your-sas-token"
+     }
+   }
+   ```
+
+   Replace `"your-sas-token"` with the actual SAS Token obtained from the previous step.
+
+### Option 3: Use Azure AD Authentication
+
+To use Azure AD Authentication, you need to ensure that your Azure CLI is logged in with a user or service principal that has the necessary permissions to access the storage account.
+
+1. **Ensure You Are Logged in via Azure CLI:**
+
+   Make sure your Azure CLI session is authenticated.
+
+   ```bash
+   az login
+   ```
+
+2. **Assign the Required Role:**
+
+   Assign a role to the user or service principal that allows access to the storage account, such as `Storage Blob Data Contributor`.
+
+   ```bash
+   az role assignment create --assignee your-azure-cli-user-or-service-principal \
+     --role "Storage Blob Data Contributor" \
+     --scope /subscriptions/your-subscription-id/resourceGroups/your-resource-group/providers/Microsoft.Storage/storageAccounts/yourstorageaccountname
+   ```
+
+### Initializing Terraform
+
+After applying one of these solutions, run `terraform init` again:
+
+```bash
+terraform init
+```
+
+This should initialize the backend without errors, allowing you to manage your Terraform state securely in Azure.
+
+-------------------------------------------
+
+How to see tfstate file:
+
+az storage blob list --account-name tfstatestorage240770 --container-name tfstate01 --output table
+	This will list all the blobs in the container, including terraform.tfstate.
+
+az storage blob download --account-name tfstatestorage240770 --container-name tfstate01 --name terraform.tfstate --file terraform.tfstate
+	This command will download the terraform.tfstate file 
+	
+
+
+-------------------------------------------
+
+To upload your code into Azure Repos and then set up an Azure Pipeline to automate the deployment of a Linux VM using Terraform, you'll need to follow these steps:
+
+### Step 1: Upload Your Code to Azure Repos
+
+1. **Create a New Repository in Azure Repos:**
+
+   - Go to your Azure DevOps project.
+   - Navigate to **Repos** > **Files**.
+   - Click on **New repository**.
+   - Enter a name for your repository and click **Create**.
+
+2. **Clone the Repository to Your Local Machine:**
+
+   Open a terminal and run the following commands to clone the repository:
+
+   ```bash
+   git clone https://dev.azure.com/your-organization/your-project/_git/your-repo-name
+   cd your-repo-name
+   ```
+
+3. **Copy Your Terraform Code:**
+
+   Copy your Terraform configuration files (e.g., `main.tf`) into the cloned repository directory.
+
+4. **Commit and Push Your Code:**
+
+   Run the following commands to add, commit, and push your code to Azure Repos:
+
+   ```bash
+   git add .
+   git commit -m "Add Terraform configuration"
+   git push origin main
+   ```
+
+   Replace `main` with your branch name if it's different.
+
+### Step 2: Set Up an Azure Pipeline
+
+1. **Create a New Pipeline:**
+
+   - Go to your Azure DevOps project.
+   - Navigate to **Pipelines** > **Pipelines**.
+   - Click **New pipeline**.
+
+2. **Select Your Source:**
+
+   Choose **Azure Repos Git** as your source and select your repository.
+
+3. **Configure Your Pipeline:**
+
+   - **YAML Pipeline:**
+     Select **YAML** to configure your pipeline using a YAML file. This is recommended for better version control and flexibility.
+
+4. **Define the YAML Pipeline:**
+
+   Create a new file in your repository named `azure-pipelines.yml` and add the following content:
+
+   ```yaml
+   trigger:
+     - main  # Trigger pipeline on changes to the 'main' branch
+
+   pool:
+     vmImage: 'ubuntu-latest'  # Use an Ubuntu VM for the pipeline
+
+   variables:
+     ARM_CLIENT_ID: '<your-service-principal-client-id>'
+     ARM_CLIENT_SECRET: '<your-service-principal-client-secret>'
+     ARM_SUBSCRIPTION_ID: '<your-subscription-id>'
+     ARM_TENANT_ID: '<your-tenant-id>'
+     ARM_ACCESS_KEY: '<your-storage-account-access-key>'  # Optional if using access key
+
+   steps:
+     - task: AzureCLI@2
+       inputs:
+         azureSubscription: '<your-service-connection-name>'
+         scriptType: 'bash'
+         scriptLocation: 'inlineScript'
+         inlineScript: |
+           # Install Terraform
+           curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+           sudo apt-get update && sudo apt-get install terraform
+
+           # Initialize Terraform
+           terraform init
+
+           # Plan Terraform deployment
+           terraform plan -out=tfplan
+
+           # Apply Terraform deployment
+           terraform apply -auto-approve tfplan
+
+   ```
+
+   Replace the placeholders (e.g., `<your-service-principal-client-id>`, `<your-subscription-id>`, etc.) with your actual Azure credentials and configuration details.
+
+5. **Create a Service Principal:**
+
+   If you haven't already created a service principal for Azure authentication, run the following command in the Azure CLI to create one:
+
+   ```bash
+   az ad sp create-for-rbac --name "your-sp-name" --role Contributor --scopes /subscriptions/your-subscription-id
+   ```
+
+   Note the `appId`, `password`, `tenant`, and subscription ID from the output. These values correspond to `ARM_CLIENT_ID`, `ARM_CLIENT_SECRET`, `ARM_TENANT_ID`, and `ARM_SUBSCRIPTION_ID`, respectively.
+
+6. **Set Up a Service Connection:**
+
+   In Azure DevOps, navigate to **Project settings** > **Service connections**. Create a new service connection for Azure Resource Manager using your service principal credentials.
+
+7. **Save and Run the Pipeline:**
+
+   Save the `azure-pipelines.yml` file, commit it to your repository, and run the pipeline. This will trigger the pipeline and execute your Terraform configuration to create a Linux VM in Azure.
+
+### Summary
+
+By following these steps, you have uploaded your Terraform code to Azure Repos and set up an Azure Pipeline to automate the deployment of your infrastructure. This setup allows you to manage your code in a version-controlled environment and leverage CI/CD practices for infrastructure management. If you need further assistance, feel free to ask!
+
+
+thporugh pipeline store statefile in safe location 
+
+update resource in repo and check weather tfstate file is update or not, check how we need to update 
+
+
+
+az keyvault create --name vault200592 --resource-group rg-Aniket-Teraform --location EastUS
+
+
+------------------------
+Creating key vault permissions:
+
+step1: select the Resource group where creating Azure Key Vault -> select "Access Control(IAM) ->Add "Add role assignment" and for Role search for "Key Vault Administrator" -> select the member by searching name or email.
+
+step2: back to same Resource group -> "Access Control(IAM).
+
+step3: select "view my access" you will find role created.
+
+step4: try creating Azure secret done.
+

@@ -827,3 +827,100 @@ Here are 30 Git interview questions with answers to help you prepare:
     Use `git reset --soft HEAD~1` to undo the last commit but keep the changes in the staging area. Use `git reset HEAD~1` to keep changes in the working directory.
 
 These questions cover various levels of Git knowledge, from basic to advanced, and provide you with a solid foundation for any Git-related interview.
+
+
+---------------------------------------------------------------
+
+Here are 30 interview questions with answers related to Azure Pipelines:
+
+### 1. **What is Azure Pipelines?**
+   **Answer:** Azure Pipelines is a cloud service in Azure DevOps that provides a Continuous Integration (CI) and Continuous Deployment (CD) environment to build, test, and deploy code to various platforms and cloud environments.
+
+### 2. **What are the key features of Azure Pipelines?**
+   **Answer:** Key features include support for multiple languages and platforms, built-in tasks for CI/CD, YAML pipeline support, integration with various tools and services, scalability with Microsoft-hosted agents, and the ability to use custom agents.
+
+### 3. **What is the difference between a build pipeline and a release pipeline in Azure DevOps?**
+   **Answer:** A build pipeline (now called a YAML pipeline) is used to automate the process of compiling, testing, and building code. A release pipeline (now considered part of the YAML pipeline for unified management) is used to automate the deployment of built artifacts to different environments.
+
+### 4. **What is a YAML pipeline?**
+   **Answer:** A YAML pipeline is a pipeline configuration file written in YAML format that defines the CI/CD process as code. YAML pipelines provide versioning, easier management, and integration with repositories.
+
+### 5. **How do you create an Azure Pipeline?**
+   **Answer:** To create an Azure Pipeline, navigate to Azure DevOps, select the project, go to Pipelines, click on "Create Pipeline," select the repository, and either configure the pipeline using YAML or use the classic editor.
+
+### 6. **What are pipeline triggers in Azure Pipelines?**
+   **Answer:** Pipeline triggers are conditions that automatically start a pipeline run. Common triggers include changes in code repositories (like Git), schedule-based triggers, and CI/CD triggers that link different pipelines.
+
+### 7. **Explain the use of `pool` in Azure Pipelines.**
+   **Answer:** The `pool` specifies the agent pool that should be used to run the jobs in the pipeline. It can reference Microsoft-hosted agents or self-hosted agents depending on requirements like specific software, custom configurations, or cost considerations.
+
+### 8. **What is a build agent in Azure Pipelines?**
+   **Answer:** A build agent (or just an agent) is a machine (Microsoft-hosted or self-hosted) that runs the jobs in a pipeline. It executes build scripts, runs tests, and deploys applications.
+
+### 9. **What are artifacts in Azure Pipelines?**
+   **Answer:** Artifacts are the output of a pipeline. They can be build outputs, test results, deployment packages, or any other file that is produced by a pipeline and needed for further deployment or use.
+
+### 10. **What is a deployment job in Azure Pipelines?**
+   **Answer:** A deployment job is a type of job in Azure Pipelines specifically designed for deployments. It provides built-in capabilities like approvals, checks, and integration with environments.
+
+### 11. **How can you use variables in Azure Pipelines?**
+   **Answer:** Variables can be defined at different scopes such as pipeline, stage, or job. They are used to store values that can be reused throughout the pipeline. Variables can be declared in the YAML file, passed from the UI, or stored as pipeline secrets.
+
+### 12. **What are task groups in Azure Pipelines?**
+   **Answer:** Task groups are a collection of pipeline tasks that are bundled together and reused across multiple pipelines. This allows for modular and reusable pipeline configurations.
+
+### 13. **What is a service connection in Azure Pipelines?**
+   **Answer:** A service connection is a configured endpoint used to connect to external services such as Azure, AWS, Docker Hub, GitHub, etc. It allows Azure Pipelines to authenticate and communicate with these services.
+
+### 14. **What is the difference between a self-hosted agent and a Microsoft-hosted agent?**
+   **Answer:** A Microsoft-hosted agent is a cloud-hosted machine provided by Azure DevOps for running pipeline jobs, pre-configured with various tools. A self-hosted agent is a machine that you set up and manage yourself, giving you control over the environment, installed tools, and configurations.
+
+### 15. **What are pipeline stages in Azure Pipelines?**
+   **Answer:** Stages are logical divisions in a pipeline that group jobs into phases. They are used to define a sequence in which jobs are executed and can have conditions, approvals, and checks associated with them.
+
+### 16. **How can you implement a multi-stage pipeline in Azure DevOps?**
+   **Answer:** A multi-stage pipeline can be implemented using a YAML file where multiple stages are defined, each containing one or more jobs. Stages can be connected sequentially or run in parallel.
+
+### 17. **What is a pipeline template in Azure Pipelines?**
+   **Answer:** A pipeline template is a YAML file that defines reusable logic for a pipeline. Templates can be used to define common steps, variables, or configurations across multiple pipelines, making it easier to maintain consistency.
+
+### 18. **How do you secure secrets in Azure Pipelines?**
+   **Answer:** Secrets in Azure Pipelines are stored in secure files, environment variables, or secret variables. Secret variables are encrypted and can be accessed only during the pipeline run.
+
+### 19. **How do you handle dependencies between jobs in Azure Pipelines?**
+   **Answer:** Dependencies between jobs are managed using the `dependsOn` property. This ensures that a job will only run after its dependent jobs have successfully completed.
+
+### 20. **What is a retention policy in Azure Pipelines?**
+   **Answer:** A retention policy specifies how long to keep pipeline runs and artifacts. It helps in managing storage costs by automatically deleting old pipeline data after a set period.
+
+### 21. **What is a condition in Azure Pipelines?**
+   **Answer:** Conditions in Azure Pipelines are expressions that determine whether a step, job, or stage should run. Common conditions include checking variable values, success or failure of previous tasks, or custom logic.
+
+### 22. **What is a deployment environment in Azure Pipelines?**
+   **Answer:** A deployment environment is a named entity that represents a target location where code is deployed. It can be used for managing approvals, checks, and monitoring deployments.
+
+### 23. **What is a gated check-in in Azure Pipelines?**
+   **Answer:** Gated check-in is a mechanism that ensures code meets certain quality gates (like passing builds and tests) before it is checked into a repository.
+
+### 24. **Explain pipeline caching in Azure Pipelines.**
+   **Answer:** Pipeline caching stores dependencies and files generated during builds to speed up subsequent builds. Caches are defined in the pipeline YAML and can reduce build time by avoiding repeated downloads or computations.
+
+### 25. **What is a build policy in Azure Pipelines?**
+   **Answer:** A build policy is a rule that defines conditions under which a build can be triggered. It is typically used to enforce standards like code coverage, test passing, and build quality.
+
+### 26. **What is the purpose of the `trigger` section in a YAML pipeline?**
+   **Answer:** The `trigger` section defines when a pipeline should be automatically run. Common triggers include commits to specific branches or schedules.
+
+### 27. **What is a pull request (PR) trigger in Azure Pipelines?**
+   **Answer:** A pull request trigger runs the pipeline whenever a pull request is created or updated. This is useful for validating changes before they are merged into a target branch.
+
+### 28. **How do you handle parallelism in Azure Pipelines?**
+   **Answer:** Parallelism in Azure Pipelines is achieved by defining multiple jobs within a stage or multiple stages that do not depend on each other. Azure Pipelines will execute these concurrently.
+
+### 29. **How do you handle pipeline errors and retries?**
+   **Answer:** Pipeline errors are handled using conditions, `continueOnError` settings, and defining steps or jobs to run on failure. Retries can be managed using the `retry` property on jobs or tasks.
+
+### 30. **How do you share code or tasks between multiple pipelines in Azure DevOps?**
+   **Answer:** Code or tasks can be shared between pipelines using YAML templates, pipeline artifacts, and task groups. Templates provide reusable YAML code, while task groups encapsulate tasks for reuse.
+
+These questions cover a broad range of topics in Azure Pipelines, from basic concepts to advanced configurations, and should help prepare you for an interview focused on Azure DevOps and CI/CD pipelines.
