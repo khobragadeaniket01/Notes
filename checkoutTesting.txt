@@ -1,0 +1,299 @@
+Checkout Pipeline: (azure-pipeline)
+
+trigger:
+  - none
+ 
+pool:
+  vmImage: 'windows-2022'
+  demands:
+    - msbuild
+    - visualstudio
+    - vstest
+ 
+parameters:
+  - name: branch
+    displayName: 'Branch Selection'
+    type: string
+    default: 'main'
+    values:
+      - main
+      - one
+      - two
+      - three
+      - four
+      - five
+      - six
+ 
+resources:
+ repositories:
+  - repository: EQMS
+    type: git
+    name: EQMS 
+    ref: refs/heads/${{ parameters.branch }}           
+ 
+jobs:
+  - job: CheckoutAndList
+    variables:
+      - group: AppSettingsChanges-One
+      - group: PublishPaths
+      - name: BuildPlatform
+        value: 'Any CPU'
+      - name: BuildConfiguration
+        value: 'Release'
+ 
+ 
+ 
+    steps:
+      - ${{ if eq(parameters.branch, 'one') }}:
+          # - checkout: git://EQMS/EQMS@refs/heads/${{ parameters.branch }}
+          - checkout: EQMS
+            displayName: 'Checkout Azure Pipeline Repo'
+          - template: Template/one.yml
+ 
+      - ${{ if eq(parameters.branch, 'two') }}:
+          - checkout: git://EQMS/EQMS@refs/heads/${{ parameters.branch }}
+            displayName: 'Checkout Azure Pipeline Repo for Branch Two'
+          - template: Template/two.yml
+ 
+      - ${{ if eq(parameters.branch, 'three') }}:
+          - checkout: git://EQMS/EQMS@refs/heads/${{ parameters.branch }}
+            displayName: 'Checkout Azure Pipeline Repo for Branch Three'
+          - template: Template/three.yml
+ 
+      - ${{ if eq(parameters.branch, 'four') }}:
+          - checkout: self
+            displayName: 'Checkout Azure Pipeline Repo for Branch Four'
+          - template: Template/four.yml
+ 
+      - ${{ if eq(parameters.branch, 'five') }}:
+        - checkout: self
+          displayName: 'Checkout Azure Pipeline Repo for Branch Five'
+        - template: Template/five.yml
+ 
+      - ${{ if eq(parameters.branch, 'six') }}:
+        - checkout: EQMS
+          displayName: 'Checkout Azure Pipeline Repo for Branch Sixth'
+        - template: Template/six.yml@EQMS
+ 
+ 
+ 
+ -----------------------------------------------------------
+ 
+ six.yml (EQMS => Template/six.yml)
+ 
+ steps:
+  - task: CmdLine@2
+    displayName: 'Moving to Sixth Branch...'
+    inputs:
+      script: 'echo Hello From Sixth file....'
+	  
+-----------------------------------------------------------------
+
+steps-template.yml  (EQMS => Template/six.yml
+
+steps:
+- task: NodeTool@0
+  displayName: 'Use Node 16.19.0'
+  inputs:
+    versionSource: 'spec'
+    versionSpec: '16.19.0'
+
+- task: CmdLine@2
+  displayName: 'Remove package-lock.json'
+  inputs:
+    script: |
+      echo Removing package-lock.json files if they exist
+      del /f /q Source\Portals\Libraries\UI\fetch-api-mixin-lib\package-lock.json || echo No package-lock.json in fetch-api-mixin-lib
+      del /f /q Source\Portals\Libraries\UI\user-context-lib\package-lock.json || echo No package-lock.json in user-context-lib	 
+
+
+- task: Cache@2
+  inputs:
+  # key: 'yarn | Source/Portals/Libraries/UI/fetch-api-mixin-lib/yarn.lock'
+    key: 'yarn | $(Agent.OS) | fetch-api-mixin-lib | $(Build.SourcesDirectory)/Source/Portals/Libraries/UI/fetch-api-mixin-lib/yarn.lock'
+    restoreKeys: |
+      yarn | $(Agent.OS)
+    path: 'Source/Portals/Libraries/UI/fetch-api-mixin-lib/node_modules'
+  displayName: 'Restore Cache fetch-api-mixin-lib node_modules'
+
+- task: Cache@2
+  inputs:
+  # key: 'yarn | Source/Portals/Libraries/UI/user-context-lib/yarn.lock'
+    key: 'yarn | $(Agent.OS) | user-context-lib | $(Build.SourcesDirectory)/Source/Portals/Libraries/UI/user-context-lib/yarn.lock'
+    restoreKeys: |
+      yarn | $(Agent.OS)
+    path: 'Source/Portals/Libraries/UI/user-context-lib/node_modules'
+  displayName: 'Restore Cache user-context-lib node_modules'
+
+- task: CmdLine@2
+  displayName: 'Install fetch-api-mixin & user-context libraries'
+  inputs:
+    script: |
+      cd Source\Portals
+
+      echo Rebuilding fetch-api-mixin-lib
+      cd Libraries\UI\fetch-api-mixin-lib
+      if not exist node_modules (
+      CALL yarn install
+      )
+      CALL yarn build-lib
+
+      echo Rebuilding user-context-lib
+      cd ..\user-context-lib
+      if not exist node_modules (
+      CALL yarn install
+      )
+      CALL yarn build-lib
+
+- task: NuGetToolInstaller@1
+  displayName: 'Install NuGet Tool'
+  inputs:
+    versionSpec: '6.0'
+
+- task: CopyFiles@2
+  displayName: 'Copy NuGet Packages'
+  inputs:
+    SourceFolder: 'Source/NugetPackages'
+    Contents: '**'
+    TargetFolder: '$(System.DefaultWorkingDirectory)/Source/NugetPackage'
+
+- task: CmdLine@2
+  displayName: 'Remove Unused Directories'
+  inputs:
+    script: |
+      echo Removing unused Directory
+      
+      rmdir /s /q "$(System.DefaultWorkingDirectory)/Source/Portals/ATT.ExternalInterface.RestAPI"
+      
+      rmdir /s /q "$(System.DefaultWorkingDirectory)/Source/Portals/TestSite"
+
+- task: PowerShell@2
+  displayName: 'Exclude Specific Projects from Solution'
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Define the solution file path
+      $solutionFilePath = "$(System.DefaultWorkingDirectory)/Source/Portals/ApplicationGateway/ATT.Application.Gateway.sln"
+            
+      # Define the project references to exclude
+      $projectsToExclude = @(
+          "ATT.Customer.Request.Terminal",
+          "ATT.Configuration",
+          "ATT.Kiosk",
+          "ATT.QueueMedia"
+      )
+            
+      # Read the solution file content
+      $solutionContent = Get-Content -Path $solutionFilePath
+            
+      # Filter out the lines that match the projects to exclude
+      $filteredContent = $solutionContent -notmatch ($projectsToExclude -join "|")
+            
+      # Write the filtered content back to the solution file
+      $filteredContent | Set-Content -Path $solutionFilePath
+            
+      Write-Output "Excluded the specified project references from the solution file."      
+
+- task: NuGetCommand@2
+  displayName: 'Restore NuGet Packages'
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(System.DefaultWorkingDirectory)/Source/Portals/**/*.sln'
+    feedsToUse: 'config'
+    nugetConfigPath: '$(System.DefaultWorkingDirectory)/Source/packages.config'
+        
+- task: VSBuild@1
+  displayName: 'Build Solution'
+  inputs:
+    solution: '$(System.DefaultWorkingDirectory)/Source/Portals/**/*.sln'
+    vsVersion: '17.0'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true'
+    platform: '$(BuildPlatform)'
+    configuration: '$(BuildConfiguration)'
+    maximumCpuCount: true
+
+#  - task: VSTest@3
+#    displayName: 'Run unit test'
+#    continueOnError: true
+#    inputs:
+#       testSelector: 'testAssemblies'
+#       testAssemblyVer2: |
+#         **\*UnitTests.dll
+#         !**\*TestAdapter.dll
+#         !**\obj\**
+#       searchFolder: '$(System.DefaultWorkingDirectory)/Source/Portals'
+#       runInParallel: true
+#       codeCoverageEnabled: true
+
+#  - task: PublishTestResults@2
+#    displayName: 'Publish Test Result'
+#    inputs:
+#       testResultsFormat: 'VSTest'
+#       testResultsFiles: '$(System.DefaultWorkingDirectory)/TestResults/*_TestResults.trx'
+#       testRunTitle: 'VS-Test'
+#       buildPlatform: '$(BuildPlatform)'
+#       buildConfiguration: '$(BuildConfiguration)'
+    
+
+- task: CmdLine@2
+  displayName: 'Copy API and Service Files'
+  inputs:
+    script: |
+      mkdir "$(PublishApiPath)"
+      xcopy "$(sourceApiPath)" "$(PublishApiPath)" /s /e
+      
+      mkdir "$(PublishBapiPath)"
+      xcopy "$(sourceBapiPath)" "$(PublishBapiPath)" /s /e
+      
+      mkdir "$(PublishHFSPath)"
+      xcopy "$(sourceHfsPath)" "$(PublishHFSPath)" /s /e
+      
+      mkdir "$(PublishKioskServicePath)"
+      xcopy "$(sourceKioskServicePath)" "$(PublishKioskServicePath)" /s /e
+      
+      mkdir "$(PublishNotificationServicePath)"
+      xcopy "$(sourceNotificationServicePath)" "$(PublishNotificationServicePath)" /s /e
+      
+      mkdir "$(PublishQueueServicePath)"
+      xcopy "$(sourceQueueServicePath)" "$(PublishQueueServicePath)" /s /e
+      
+      mkdir "$(PublishApplicationReportPath)"
+      xcopy "$(sourceReportApiPath)" "$(PublishApplicationReportPath)" /s /e
+      
+      mkdir "$(PublishPubSubPath)"
+      xcopy "$(sourcePubSubPath)" "$(PublishPubSubPath)" /s /e
+      
+      mkdir "$(publishGatewayPath)"
+      xcopy "$(publishSourceGateway)" "$(publishGatewayPath)" /s /e
+      
+      mkdir "$(publishConfigurationPath)"
+      xcopy "$(publishSourceConfiguration)" "$(publishConfigurationPath)" /s /e
+      
+      mkdir "$(publishCrtPath)"
+      xcopy "$(publishSourceCrt)" "$(publishCrtPath)" /s /e
+      
+      mkdir "$(publishKioskPath)"
+      xcopy "$(publishSourceKiosk)" "$(publishKioskPath)" /s /e
+      
+      mkdir "$(publishQueueMediaPath)"
+      xcopy "$(publishSourceQueueMedia)" "$(publishQueueMediaPath)" /s /e
+      
+      7z a "$(Build.ArtifactStagingDirectory)/combined.zip" "$(Build.ArtifactStagingDirectory)/combined/*"
+      
+      rmdir /s /q "$(Build.ArtifactStagingDirectory)/combined"
+
+- task: FileTransform@2
+  displayName: 'Transform Configuration Files'
+  inputs:
+    folderPath: '$(Build.ArtifactStagingDirectory)/Combined.zip'
+    xmlTransformationRules: 
+    jsonTargetFiles: '**\**\appsettings.json'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+	  
+
