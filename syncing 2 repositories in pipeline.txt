@@ -1,0 +1,136 @@
+I am using azure devops.
+I have 2 repositories EQMS and azure-pipelines.
+in Azure pipelines i have my yaml file which is a primary pipeline file named as checkout.yml.
+in EQMS i have another yaml file named as one.yml.
+now my source code is present in EQMS repository.
+but the libraries installation task is present in one.yml file which is present into another repository.
+Now i have to sync both repository in pipeline so that it will install libraries.
+Guide me step by step how can i do it
+
+
+To achieve the synchronization between the two repositories (`EQMS` and `azure-pipelines`) in your Azure DevOps pipeline, you need to configure multiple repository checkouts in your `checkout.yml` file. Here is the step-by-step guide to do that:
+
+### Step-by-Step Solution
+
+1. **Modify `checkout.yml` to Include Multiple Repositories**
+
+   Update the `resources` section in your `checkout.yml` file to define both repositories (`EQMS` and `azure-pipelines`). Then, you need to ensure both repositories are checked out in your pipeline steps.
+
+   ```yaml
+   resources:
+     repositories:
+       - repository: EQMS
+         type: git
+         name: EQMS
+         ref: refs/heads/${{ parameters.branch }}
+       - repository: azure-pipelines
+         type: git
+         name: azure-pipelines
+         ref: refs/heads/main  # Replace with the appropriate branch
+   ```
+
+2. **Checkout Multiple Repositories in Your Pipeline Steps**
+
+   In the `steps` section of the `CheckoutAndList` job, you should update the checkout steps to include both repositories. Here is the modified `steps` section:
+
+   ```yaml
+   jobs:
+     - job: CheckoutAndList
+       variables:
+         - group: AppSettingsChanges-One
+         - group: PublishPaths
+         - name: BuildPlatform
+           value: 'Any CPU'
+         - name: BuildConfiguration
+           value: 'Release'
+
+       steps:
+         - checkout: EQMS  # Checkout EQMS Repository
+           displayName: 'Checkout EQMS Repository'
+
+         - checkout: azure-pipelines  # Checkout azure-pipelines Repository
+           displayName: 'Checkout Azure Pipelines Repository'
+
+         - template: Template/one.yml@azure-pipelines  # Reference the template from azure-pipelines repository
+   ```
+
+3. **Reference `one.yml` from the `azure-pipelines` Repository**
+
+   Update the reference to `one.yml` in the `steps` section to explicitly mention that the file is located in the `azure-pipelines` repository using `@azure-pipelines`:
+
+   ```yaml
+   steps:
+     - template: Template/one.yml@azure-pipelines
+   ```
+
+   This step tells the pipeline to use the `one.yml` file from the `azure-pipelines` repository.
+
+4. **Ensure Correct Path to Your `one.yml` Template**
+
+   Double-check that the path to the `one.yml` file is correct in the `azure-pipelines` repository. If the `one.yml` file is located in a different directory, update the path accordingly.
+
+5. **Trigger the Pipeline**
+
+   Now, when you trigger the pipeline, it will first checkout both repositories (`EQMS` and `azure-pipelines`). Then, it will reference the `one.yml` file from the `azure-pipelines` repository to run the steps required to install libraries and build the project.
+
+### Final Version of `checkout.yml`
+
+Here's the complete `checkout.yml` with the modifications:
+
+```yaml
+trigger:
+  - none
+
+pool:
+  vmImage: 'windows-2022'
+  demands:
+    - msbuild
+    - visualstudio
+    - vstest
+
+parameters:
+  - name: branch
+    displayName: 'Branch Selection'
+    type: string
+    default: 'main'
+    values:
+      - main
+      - one
+      - two
+      - three
+      - four
+      - five
+      - six
+
+resources:
+  repositories:
+    - repository: EQMS
+      type: git
+      name: EQMS 
+      ref: refs/heads/${{ parameters.branch }}
+    - repository: azure-pipelines
+      type: git
+      name: azure-pipelines
+      ref: refs/heads/main  # Replace with the correct branch if needed
+
+jobs:
+  - job: CheckoutAndList
+    variables:
+      - group: AppSettingsChanges-One
+      - group: PublishPaths
+      - name: BuildPlatform
+        value: 'Any CPU'
+      - name: BuildConfiguration
+        value: 'Release'
+
+    steps:
+      - checkout: EQMS
+        displayName: 'Checkout EQMS Repository'
+
+      - checkout: azure-pipelines
+        displayName: 'Checkout Azure Pipelines Repository'
+
+      - template: Template/one.yml@azure-pipelines
+```
+
+By following these steps, your pipeline will synchronize both repositories and execute the tasks defined in `one.yml`.
