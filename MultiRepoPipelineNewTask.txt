@@ -1,0 +1,636 @@
+Project Name: TestingMultiCheckOut
+
+Three Different Repos:
+
+	- EQMS
+
+	- EQMS2
+
+	- Pipeline
+ 
+EQMS --> Branch1 (create readme.md file --> This is Branch1 of EQMS Repo)
+
+		 Branch2 (create readme.md file --> This is Branch2 of EQMS Repo)
+
+		 Branch3 (create readme.md file --> This is Branch3 of EQMS Repo)
+ 
+EQMS2 --> Branch1 (create readme.md file --> This is Branch1 of EQMS2 Repo)
+
+		  Branch2 (create readme.md file --> This is Branch2 of EQMS2 Repo)
+
+		  Branch3 (create readme.md file --> This is Branch3 of EQMS2 Repo)
+
+Pipeline --> Master
+
+			--> azure-pipeline.yml
+
+			--> Templates:
+
+				EQMS-Branch1.yaml (read that readme file in that branch)
+
+				EQMS-Branch2.yaml (read that readme file in that branch)
+
+				EQMS-Branch3.yaml (read that readme file in that branch)
+
+				EQMS2-Branch1.yaml (read that readme file in that branch)
+
+				EQMS2-Branch2.yaml (read that readme file in that branch)
+
+				EQMS2-Branch3.yaml (read that readme file in that branch)
+ 
+ 
+ 
+ 1. Life waits for nobody, get up everyday and keep pushing through
+ 2. make sure you take good care of yourself, if something happens to you world will move on and you will fall behind
+ 3. If you don't work to build your dream life, someone will hire you to build theirs
+ 4. Work in silence, Celebrate in Private, people love to ruin things
+ 5. Don't regret your past, just learn from it and move on..
+ 6. No one cares. Work harder to become better person each day
+ 7. Ignore Advice from any one who doesn't live the life you want to live
+ 8. Rule over your emotions. A calm mind can handle any situation
+ 
+---------------------------------------------------------------------- 
+ 
+ 
+ I have created 3 different repositories in my project (TestingMultiCheckOut).
+Repositories names are:
+1. EQMS
+2. EQMS2
+3. Pipeline.
+
+In that 3 repositories, I have to create 3 branches with a readme.md file
+In EQMS branches are :
+ Branch1 (Readme file -> you are in Branch1 of EQMS)
+ Branch2 (Readme file -> you are in Branch2 of EQMS)
+ Branch3 (Readme file -> you are in Branch3 of EQMS)
+
+In EQMS2 branches are :
+ Branch1 (Readme file -> you are in Branch1 of EQMS2)
+ Branch2 (Readme file -> you are in Branch2 of EQMS2)
+ Branch3 (Readme file -> you are in Branch3 of EQMS2)
+
+In Pipeline branch there is main pipeline named as azure-pipeline.yml which contain the pipeline script and also contain a Template folder which contain:
+ EQMS-Branch1.yaml (read that readme file in that Branch1 of EQMS Repo)
+ EQMS-Branch2.yaml (read that readme file in that Branch2 of EQMS Repo)
+ EQMS-Branch3.yaml (read that readme file in that Branch3 of EQMS Repo)
+ EQMS2-Branch1.yaml (read that readme file in that Branch1 of EQMS2 Repo)
+ EQMS2-Branch2.yaml (read that readme file in that Branch2 of EQMS2 Repo)
+ EQMS2-Branch3.yaml (read that readme file in that Branch3 of EQMS2 Repo)
+
+i have created azure-pipeline.yml:
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: branch
+  displayName: 'Branch Selection'
+  type: string
+  default: 'main'
+  values:
+    - main
+    - Branch1
+    - Branch2
+    - Branch3
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- ${{ if eq(parameters.branch, 'Branch1') }}:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/${{ parameters.branch }}
+    displayName: 'Checkout EQMS Branch1'
+
+- ${{ if eq(parameters.branch, 'Branch2') }}:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/${{ parameters.branch }}
+    displayName: 'Checkout EQMS Branch2'
+
+- ${{ if eq(parameters.branch, 'Branch1') }}:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/${{ parameters.branch }}
+    displayName: 'Checkout EQMS Branch3'
+
+Guide me how can i create EQMS-Branch1.yaml.
+
+and also guide me through all the process
+
+
+------------------------------------------------------------------
+
+old pipeline:
+
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: branch
+  displayName: 'Branch Selection'
+  type: string
+  default: 'main'
+  values:
+    - main
+    - Branch1
+    - Branch2
+    - Branch3
+
+- name: repo
+  displayName: 'Repository Selection'
+  type: string
+  default: 'EQMS'
+  values:
+    - EQMS
+    - EQMS2
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- ${{ if eq(parameters.branch, 'Branch1') }}:
+  - template: Template/EQMS-Branch1.yaml
+
+- ${{ if eq(parameters.branch, 'Branch2') }}:
+  - template: Template/EQMS-Branch2.yaml
+
+- ${{ if eq(parameters.branch, 'Branch3') }}:
+  - template: Template/EQMS-Branch3.yaml
+
+
+=-============================================================
+
+I have created 3 different repositories in my project (TestingMultiCheckOut).
+Repositories names are:
+1. EQMS
+2. EQMS2
+3. Pipeline.
+
+In that 3 repositories, I have to create 3 branches with a readme.md file
+In EQMS branches are :
+ Branch1 (Readme file -> you are in Branch1 of EQMS)
+ Branch2 (Readme file -> you are in Branch2 of EQMS)
+ Branch3 (Readme file -> you are in Branch3 of EQMS)
+
+In EQMS2 branches are :
+ Branch1 (Readme file -> you are in Branch1 of EQMS2)
+ Branch2 (Readme file -> you are in Branch2 of EQMS2)
+ Branch3 (Readme file -> you are in Branch3 of EQMS2)
+
+In Pipeline branch there is main pipeline named as azure-pipeline.yml which contain the pipeline script and also contain a Template folder which contain:
+ EQMS-Branch1.yaml (read that readme file in that Branch1 of EQMS Repo)
+ EQMS-Branch2.yaml (read that readme file in that Branch2 of EQMS Repo)
+ EQMS-Branch3.yaml (read that readme file in that Branch3 of EQMS Repo)
+ EQMS2-Branch1.yaml (read that readme file in that Branch1 of EQMS2 Repo)
+ EQMS2-Branch2.yaml (read that readme file in that Branch2 of EQMS2 Repo)
+ EQMS2-Branch3.yaml (read that readme file in that Branch3 of EQMS2 Repo)
+
+i have created azure-pipeline.yml:
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: branch
+  displayName: 'Branch Selection'
+  type: string
+  default: 'main'
+  values:
+    - main
+    - Branch1
+    - Branch2
+    - Branch3
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- ${{ if eq(parameters.branch, 'Branch1') }}:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/${{ parameters.branch }}
+    displayName: 'Checkout EQMS Branch1'
+
+- ${{ if eq(parameters.branch, 'Branch2') }}:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/${{ parameters.branch }}
+    displayName: 'Checkout EQMS Branch2'
+
+- ${{ if eq(parameters.branch, 'Branch1') }}:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/${{ parameters.branch }}
+    displayName: 'Checkout EQMS Branch3'
+
+Guide me how can i create EQMS-Branch1.yaml.
+
+and also guide me through all the process
+
+
+=>
+To create the `EQMS-Branch1.yaml` file in the `Pipeline` repository, follow these steps:
+
+### Step-by-Step Guide
+
+#### 1. Create `EQMS-Branch1.yaml` in the Template Folder
+
+This YAML file will perform the following tasks:
+- Check out the `Branch1` of the `EQMS` repository.
+- Read and display the content of the `readme.md` file in `Branch1`.
+
+Here is the content for `EQMS-Branch1.yaml`:
+
+```yaml
+steps:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/Branch1
+    displayName: 'Checkout EQMS Branch1'
+  
+  - script: |
+      type readme.md
+    displayName: 'Read the content of readme.md from Branch1'
+```
+
+#### Explanation:
+
+- **`checkout` step**: Checks out the `Branch1` of the `EQMS` repository.
+- **`script` step**: Executes a script to display the contents of the `readme.md` file.
+
+#### 2. Repeat for Other YAML Templates
+
+You need to create similar YAML files for the other branches in the `EQMS` and `EQMS2` repositories. Here is the structure for `EQMS-Branch2.yaml` and `EQMS-Branch3.yaml`:
+
+##### `EQMS-Branch2.yaml`
+```yaml
+steps:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/Branch2
+    displayName: 'Checkout EQMS Branch2'
+  
+  - script: |
+      type readme.md
+    displayName: 'Read the content of readme.md from Branch2'
+```
+
+##### `EQMS-Branch3.yaml`
+```yaml
+steps:
+  - checkout: git://TestingMultiCheckOut/EQMS@refs/heads/Branch3
+    displayName: 'Checkout EQMS Branch3'
+  
+  - script: |
+      type readme.md
+    displayName: 'Read the content of readme.md from Branch3'
+```
+
+Similarly, create files for the `EQMS2` repository (`EQMS2-Branch1.yaml`, `EQMS2-Branch2.yaml`, `EQMS2-Branch3.yaml`) by following the same structure, but replacing the repository name and branch accordingly.
+
+#### 3. Update the `azure-pipeline.yml`
+
+Modify your `azure-pipeline.yml` to include these template files dynamically based on the selected branch. Here is how you can adjust it:
+
+```yaml
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: branch
+  displayName: 'Branch Selection'
+  type: string
+  default: 'main'
+  values:
+    - main
+    - Branch1
+    - Branch2
+    - Branch3
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- ${{ if eq(parameters.branch, 'Branch1') }}:
+  - template: Template/EQMS-Branch1.yaml
+
+- ${{ if eq(parameters.branch, 'Branch2') }}:
+  - template: Template/EQMS-Branch2.yaml
+
+- ${{ if eq(parameters.branch, 'Branch3') }}:
+  - template: Template/EQMS-Branch3.yaml
+```
+
+#### Explanation:
+
+- **`template` step**: Refers to the YAML template files you created in the `Template` folder.
+- Depending on the selected branch (`Branch1`, `Branch2`, `Branch3`), the corresponding YAML file is loaded dynamically.
+
+### Final Steps
+
+1. **Commit the Files**: Make sure all changes are committed to the respective branches in the `Pipeline` repository.
+2. **Run the Pipeline**: Trigger the pipeline and select the desired branch. The pipeline will use the appropriate template to check out and read the content of the `readme.md` file from the selected branch. 
+
+By following these steps, you ensure that your pipeline dynamically checks out the correct branch and reads the required content based on the user-selected branch parameter.
+
+==============================================================================
+And what about EQMS2 repository 
+
+=>
+
+For the `EQMS2` repository, you'll need to create similar YAML template files that handle each branch of the `EQMS2` repository and read the content of the `readme.md` file. Let's walk through the steps for creating these YAML files.
+
+### 1. Create YAML Templates for `EQMS2` Repository
+
+You will need three YAML files in the `Template` folder for the `EQMS2` repository. Each file will handle a specific branch (`Branch1`, `Branch2`, and `Branch3`).
+
+#### `EQMS2-Branch1.yaml`
+
+This file will check out `Branch1` of the `EQMS2` repository and display the content of the `readme.md` file.
+
+```yaml
+steps:
+  - checkout: git://TestingMultiCheckOut/EQMS2@refs/heads/Branch1
+    displayName: 'Checkout EQMS2 Branch1'
+  
+  - script: |
+      type readme.md
+    displayName: 'Read the content of readme.md from EQMS2 Branch1'
+```
+
+#### `EQMS2-Branch2.yaml`
+
+This file will check out `Branch2` of the `EQMS2` repository and display the content of the `readme.md` file.
+
+```yaml
+steps:
+  - checkout: git://TestingMultiCheckOut/EQMS2@refs/heads/Branch2
+    displayName: 'Checkout EQMS2 Branch2'
+  
+  - script: |
+      type readme.md
+    displayName: 'Read the content of readme.md from EQMS2 Branch2'
+```
+
+#### `EQMS2-Branch3.yaml`
+
+This file will check out `Branch3` of the `EQMS2` repository and display the content of the `readme.md` file.
+
+```yaml
+steps:
+  - checkout: git://TestingMultiCheckOut/EQMS2@refs/heads/Branch3
+    displayName: 'Checkout EQMS2 Branch3'
+  
+  - script: |
+      type readme.md
+    displayName: 'Read the content of readme.md from EQMS2 Branch3'
+```
+
+### 2. Update the `azure-pipeline.yml`
+
+Now, update your main `azure-pipeline.yml` file to dynamically load these templates based on the branch selection. Here’s how you can modify the file:
+
+```yaml
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: branch
+  displayName: 'Branch Selection'
+  type: string
+  default: 'main'
+  values:
+    - main
+    - Branch1
+    - Branch2
+    - Branch3
+
+- name: repo
+  displayName: 'Repository Selection'
+  type: string
+  default: 'EQMS'
+  values:
+    - EQMS
+    - EQMS2
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- ${{ if and(eq(parameters.repo, 'EQMS'), eq(parameters.branch, 'Branch1')) }}:
+  - template: Template/EQMS-Branch1.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS'), eq(parameters.branch, 'Branch2')) }}:
+  - template: Template/EQMS-Branch2.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS'), eq(parameters.branch, 'Branch3')) }}:
+  - template: Template/EQMS-Branch3.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS2'), eq(parameters.branch, 'Branch1')) }}:
+  - template: Template/EQMS2-Branch1.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS2'), eq(parameters.branch, 'Branch2')) }}:
+  - template: Template/EQMS2-Branch2.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS2'), eq(parameters.branch, 'Branch3')) }}:
+  - template: Template/EQMS2-Branch3.yaml
+```
+
+### Explanation
+
+- **New Parameter: `repo`**: A new parameter `repo` is added to let the user select which repository (`EQMS` or `EQMS2`) to use in the pipeline.
+- **Conditional Template Inclusions**: The pipeline checks both the `repo` and `branch` parameters to determine which template to use. Depending on the selected repository and branch, the appropriate YAML file is loaded dynamically.
+
+### Final Steps
+
+1. **Create and Save YAML Files**: Ensure all the new YAML files (`EQMS2-Branch1.yaml`, `EQMS2-Branch2.yaml`, `EQMS2-Branch3.yaml`) are created in the `Template` folder of the `Pipeline` repository.
+2. **Commit All Changes**: Commit all changes to the `Pipeline` repository.
+3. **Run the Pipeline**: When you run the pipeline, you will be able to select both the repository (`EQMS` or `EQMS2`) and the branch (`Branch1`, `Branch2`, `Branch3`). The pipeline will then dynamically load the correct template file based on these selections.
+
+By following these steps, you can effectively manage multiple repositories and branches using Azure Pipelines, allowing for flexible and dynamic pipeline execution.
+
+=====================================================================
+
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: branch
+  displayName: 'Branch Selection'
+  type: string
+  default: 'main'
+  values:
+    - main
+    - Branch1
+    - Branch2
+    - Branch3
+
+- name: repo
+  displayName: 'Repository Selection'
+  type: string
+  default: 'EQMS'
+  values:
+    - EQMS
+    - EQMS2
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- ${{ if and(eq(parameters.repo, 'EQMS'), eq(parameters.branch, 'Branch1')) }}:
+  - template: Template/EQMS-Branch1.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS'), eq(parameters.branch, 'Branch2')) }}:
+  - template: Template/EQMS-Branch2.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS'), eq(parameters.branch, 'Branch3')) }}:
+  - template: Template/EQMS-Branch3.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS2'), eq(parameters.branch, 'Branch1')) }}:
+  - template: Template/EQMS2-Branch1.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS2'), eq(parameters.branch, 'Branch2')) }}:
+  - template: Template/EQMS2-Branch2.yaml
+
+- ${{ if and(eq(parameters.repo, 'EQMS2'), eq(parameters.branch, 'Branch3')) }}:
+  - template: Template/EQMS2-Branch3.yaml
+
+
+above is my pipeline and it is working fine, but can i used any other approach which should exclude this step from my pipeline:
+
+- name: repo
+  displayName: 'Repository Selection'
+  type: string
+  default: 'EQMS'
+  values:
+    - EQMS
+    - EQMS2
+
+=>
+
+Yes, you can modify your pipeline to dynamically determine the repository without explicitly asking the user to select it via a parameter. Instead, you could rely solely on the branch parameter and use naming conventions or conditions to infer which repository to use. 
+
+### Alternative Approach
+
+If the branch names are unique across repositories (meaning `Branch1`, `Branch2`, and `Branch3` exist in both `EQMS` and `EQMS2`), you can use a single parameter for the branch and infer the repository from the branch name itself or by implementing conditional logic within the pipeline.
+
+Here’s how you can achieve this:
+
+#### 1. Update `azure-pipeline.yml`
+
+Remove the `repo` parameter and add conditional logic that uses the branch parameter to determine which repository to check out. Below is the revised YAML file:
+
+```yaml
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: branch
+  displayName: 'Branch Selection'
+  type: string
+  default: 'main'
+  values:
+    - main
+    - Branch1
+    - Branch2
+    - Branch3
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+# Conditions to infer the repository based on branch names
+- ${{ if eq(parameters.branch, 'Branch1') }}:
+  - template: ${{ if eq('EQMS', 'EQMS') }}: Template/EQMS-Branch1.yaml
+    ${{ if eq('EQMS2', 'EQMS2') }}: Template/EQMS2-Branch1.yaml
+
+- ${{ if eq(parameters.branch, 'Branch2') }}:
+  - template: ${{ if eq('EQMS', 'EQMS') }}: Template/EQMS-Branch2.yaml
+    ${{ if eq('EQMS2', 'EQMS2') }}: Template/EQMS2-Branch2.yaml
+
+- ${{ if eq(parameters.branch, 'Branch3') }}:
+  - template: ${{ if eq('EQMS', 'EQMS') }}: Template/EQMS-Branch3.yaml
+    ${{ if eq('EQMS2', 'EQMS2') }}: Template/EQMS2-Branch3.yaml
+
+```
+
+#### Explanation
+
+1. **Single Branch Parameter**: The pipeline now has only the branch parameter, removing the need for a separate repository parameter.
+2. **Dynamic Template Selection**: The templates are conditionally loaded based on the branch name, without needing a separate `repo` parameter.
+
+
+===================================================================
+
+/azure-pipelines.yml: (Line: 24, Col: 43, Idx: 431) - (Line: 24, Col: 43, Idx: 431): Mapping values are not allowed in this context.
+
+=>
+
+The error message you encountered ("Mapping values are not allowed in this context") is due to the incorrect YAML syntax where I tried to use conditional expressions directly in the template path. YAML does not support such nested conditional expressions within a single mapping field.
+
+To solve this, we need a different approach to dynamically choose the repository and branch without explicitly using a separate parameter for the repository.
+
+### Corrected Approach: Use a Single Parameter with Repository and Branch Information
+
+You can combine both repository and branch information into a single parameter and use that parameter to determine which repository and branch should be checked out. Here's how to do it:
+
+#### 1. Update `azure-pipeline.yml`
+
+Change the branch parameter to include both the repository and branch information. This avoids the need for multiple conditions:
+
+```yaml
+trigger:
+- none
+
+pool:
+  vmImage: 'windows-2022'
+
+parameters:
+- name: repoBranch
+  displayName: 'Repository and Branch Selection'
+  type: string
+  default: 'EQMS/Branch1'
+  values:
+    - EQMS/Branch1
+    - EQMS/Branch2
+    - EQMS/Branch3
+    - EQMS2/Branch1
+    - EQMS2/Branch2
+    - EQMS2/Branch3
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- ${{ if eq(parameters.repoBranch, 'EQMS/Branch1') }}:
+  - template: Template/EQMS-Branch1.yaml
+
+- ${{ if eq(parameters.repoBranch, 'EQMS/Branch2') }}:
+  - template: Template/EQMS-Branch2.yaml
+
+- ${{ if eq(parameters.repoBranch, 'EQMS/Branch3') }}:
+  - template: Template/EQMS-Branch3.yaml
+
+- ${{ if eq(parameters.repoBranch, 'EQMS2/Branch1') }}:
+  - template: Template/EQMS2-Branch1.yaml
+
+- ${{ if eq(parameters.repoBranch, 'EQMS2/Branch2') }}:
+  - template: Template/EQMS2-Branch2.yaml
+
+- ${{ if eq(parameters.repoBranch, 'EQMS2/Branch3') }}:
+  - template: Template/EQMS2-Branch3.yaml
+```
+
+#### Explanation
+
+1. **Single `repoBranch` Parameter**: Combines both repository and branch into a single parameter (e.g., `EQMS/Branch1`, `EQMS2/Branch1`), making it easier to manage and removing the need for a separate repository parameter.
+2. **Conditional Template Inclusion**: The pipeline uses a single parameter to dynamically choose the correct template file based on the combined repository and branch information.
+
+### 2. Run the Pipeline
+
+When you run the pipeline, the dropdown will allow you to select the repository and branch combination in a single step, which will then use the appropriate template to check out and display the content of the `readme.md` file from the correct repository and branch.
